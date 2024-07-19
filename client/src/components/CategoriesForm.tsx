@@ -16,10 +16,10 @@ function ProductForm({ onSubmit, initialValues }: ProductCategories) {
     const validate = (values: CategoriesFormParams) => {
         const { name, description } = values;
         const errors: ValidationErrors = {};
-        if (!name) errors.title = "Cần nhập tên sản phẩm";
+        if (!name) errors.title = "Cần nhập tên danh mục";
         if (name && name.length < 6)
-            errors.title = "Cần nhập tối thiểu 6 kí tự";
-        if (!description) errors.price = "Cần nhập giá";
+            errors.title = "Tên danh mục cần có tối thiểu 6 ký tự";
+        if (!description) errors.price = "Cần nhập mô tả";
         return errors;
     };
 
@@ -30,13 +30,13 @@ function ProductForm({ onSubmit, initialValues }: ProductCategories) {
             initialValues={initialValues}
             render={({ values }) => {
                 return (
-                    <Stack>
+                    <Stack spacing={2}>
                         <Field
                             name="name"
                             render={({ input, meta }) => (
                                 <InputText
                                     input={input}
-                                    label={"Title"}
+                                    label={"Tên Danh Mục"}
                                     messageError={meta.touched && meta.error}
                                 />
                             )}
@@ -46,7 +46,7 @@ function ProductForm({ onSubmit, initialValues }: ProductCategories) {
                             render={({ input, meta }) => (
                                 <InputText
                                     input={input}
-                                    label={"Description"}
+                                    label={"Mô Tả"}
                                     messageError={meta.touched && meta.error}
                                 />
                             )}
@@ -55,22 +55,21 @@ function ProductForm({ onSubmit, initialValues }: ProductCategories) {
                             type="submit"
                             onClick={() => onSubmit(values)}
                             sx={{
-                                backgroundColor: 'primary.main',
-                                color: 'black',
+                                backgroundColor: '#1976d2', 
+                                color: '#fff', 
                                 margin: '20px',
                                 padding: '10px 20px',
                                 fontSize: '16px',
                                 fontWeight: 'bold',
                                 borderRadius: '8px',
                                 '&:hover': {
-                                    backgroundColor: 'primary.dark',
+                                    backgroundColor: '#1565c0', 
                                 },
                                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                             }}
                         >
-                            Submit
+                            Gửi
                         </Button>
-
                     </Stack>
                 );
             }}

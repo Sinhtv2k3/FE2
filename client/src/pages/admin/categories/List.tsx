@@ -1,7 +1,9 @@
 import {
+    Box,
     Button,
     Container,
     Paper,
+    Snackbar,
     Stack,
     Table,
     TableBody,
@@ -14,15 +16,13 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ConfirmDialog from "src/components/ConfirmDialog";
-import Flash from "src/components/Flash";
 import { useLoading } from "src/contexts/loading";
 import { Categories } from "src/types/Product";
 
 function AdminCategoriesList() {
     const { setLoading } = useLoading();
-    const [showFlash, setShowFlash] = useState(false);
-    const [confirm, setConfirm] = useState(false);
+    const [showSnackbar, setShowSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
     const [products, setProducts] = useState<Categories[]>([]);
     const [idDelete, setIdDelete] = useState<string | null>(null);
 
@@ -42,50 +42,66 @@ function AdminCategoriesList() {
         getAllList();
     }, []);
 
-    const handleConfirm = (id: string) => {
-        setConfirm(true);
-        setIdDelete(id);
-    };
-
-    const handleDelete = async () => {
+    const handleDelete = async (id: string) => {
         try {
-            await axios.delete("/categories/" + idDelete);
-            setShowFlash(true);
+            await axios.delete("/categories/" + id);
+            setSnackbarMessage("Xóa danh mục thành công.");
+            setShowSnackbar(true);
             getAllList();
         } catch (error) {
             console.log(error);
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setShowSnackbar(false);
+    };
+
     return (
         <Container>
-            <Flash isShow={showFlash} />
+            <Snackbar
+                open={showSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                message={snackbarMessage}
+            />
             <Stack gap={2}>
                 <Typography variant="h2" textAlign="center">
-                    Categories List
+                    Danh Sách Danh Mục
                 </Typography>
                 <Link to="/admin/categories/add">
-                    <Button variant="contained">Add Categories</Button>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            bgcolor: "#1976d2", 
+                            color: "#fff", 
+                            "&:hover": {
+                                bgcolor: "#005bb5", 
+                            },
+                        }}
+                    >
+                        Thêm Danh Mục
+                    </Button>
                 </Link>
-                <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+                <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell align="right">Description</TableCell>
-                                <TableCell align="center">Actions</TableCell>
+                                <TableCell style={{ border: "1px solid #ddd" }}>Tên</TableCell>
+                                <TableCell align="right" style={{ border: "1px solid #ddd" }}>Mô Tả</TableCell>
+                                <TableCell align="center" style={{ border: "1px solid #ddd" }}>Hành Động</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {products.map((categories, index) => (
+                            {products.map((category, index) => (
                                 <TableRow key={index}>
-                                    <TableCell component="th" scope="row">
-                                        {categories?.name}
+                                    <TableCell component="th" scope="row" style={{ border: "1px solid #ddd" }}>
+                                        {category.name}
                                     </TableCell>
-                                    <TableCell align="right">{categories?.description}</TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="right" style={{ border: "1px solid #ddd" }}>{category.description}</TableCell>
+                                    <TableCell align="center" style={{ border: "1px solid #ddd" }}>
                                         <Stack direction="row" spacing={3} justifyContent="center">
-                                            <Link to={`/admin/categories/edit/${categories?._id}`}>
+                                            <Link to={`/admin/categories/edit/${category._id}`}>
                                                 <Button
                                                     variant="contained"
                                                     sx={{
@@ -96,7 +112,7 @@ function AdminCategoriesList() {
                                                         },
                                                     }}
                                                 >
-                                                    Edit
+                                                    Sửa
                                                 </Button>
                                             </Link>
                                             <Button
@@ -108,9 +124,9 @@ function AdminCategoriesList() {
                                                         bgcolor: "#c82333",
                                                     },
                                                 }}
-                                                onClick={() => handleConfirm(categories?._id)}
+                                                onClick={() => setIdDelete(category._id)}
                                             >
-                                                Delete
+                                                Xóa
                                             </Button>
                                         </Stack>
                                     </TableCell>
@@ -120,11 +136,40 @@ function AdminCategoriesList() {
                     </Table>
                 </TableContainer>
             </Stack>
-            <ConfirmDialog
-                confirm={confirm}
-                onConfirm={setConfirm}
-                onDelete={handleDelete}
-            />
+            {idDelete && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        bgcolor: "#fff",
+                        boxShadow: 4,
+                        p: 3,
+                    }}
+                >
+                    <Typography variant="h5" mb={2}>
+                        Xác nhận xóa danh mục
+                    </Typography>
+                    <Typography variant="body1" mb={2}>
+                        Bạn có chắc chắn muốn xóa danh mục này?
+                    </Typography>
+                    <Stack direction="row" spacing={2} justifyContent="center">
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                handleDelete(idDelete);
+                                setIdDelete(null);
+                            }}
+                        >
+                            Xác nhận
+                        </Button>
+                        <Button variant="contained" onClick={() => setIdDelete(null)}>
+                            Hủy
+                        </Button>
+                    </Stack>
+                </Box>
+            )}
         </Container>
     );
 }

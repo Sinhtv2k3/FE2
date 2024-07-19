@@ -24,7 +24,7 @@ function Homepage() {
   const getAllProducts = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("/products"); 
+      const { data } = await axios.get("/products");
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -43,15 +43,18 @@ function Homepage() {
       justifyContent="center"
       alignItems="center"
       minHeight="100vh"
+      p={2}
     >
       {loading ? (
         <Loading isShow={loading} />
       ) : (
         <Box
           display="grid"
-          gridTemplateColumns="repeat(3, 1fr)"
+          gridTemplateColumns="repeat(auto-fit, minmax(240px, 1fr))"
           gap={3}
-          justifyItems="center"
+          justifyContent="center"
+          width="100%"
+          maxWidth="1200px"
         >
           {products.map((product, index) => (
             <ProductCard key={index} product={product} />

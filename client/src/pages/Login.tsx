@@ -1,4 +1,5 @@
-import { Button, Container, Stack, Typography } from "@mui/material";
+import React from "react";
+import { Button, Container, Stack, Typography, Link, Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import { ValidationErrors } from "final-form";
 import { Field, Form } from "react-final-form";
@@ -14,6 +15,9 @@ type LoginFormParams = {
 
 const Login = () => {
   const navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<"success" | "error">("success");
 
   const validate = (values: LoginFormParams) => {
     const { email, password } = values;
@@ -29,33 +33,43 @@ const Login = () => {
   const onSubmit = async (values: LoginFormParams) => {
     try {
       const { data } = await axios.post("/auth/login", values);
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("authToken", data.token); 
       localStorage.setItem("user", JSON.stringify(data.user));
+      setSnackbarMessage("Đăng nhập thành công!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
       setTimeout(() => {
-        navigate("/homepage");
+        navigate("/");
       }, 2000);
     } catch (error) {
       console.error("Error during login:", error);
+      setSnackbarMessage("Đã xảy ra lỗi khi đăng nhập.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
     <Container>
-      <Typography variant="h2" textAlign={"center"} mb={2}>
-        Login
+      <Typography variant="h2" textAlign="center" mb={2}>
+        Đăng nhập
       </Typography>
       <Form
         onSubmit={onSubmit}
         validate={validate}
-        render={({ values }) => {
-          return (
+        render={({ handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
             <Stack gap={2}>
               <Field
                 name="email"
                 render={({ input, meta }) => (
                   <InputText
                     input={input}
-                    label={"Email"}
+                    label="Email"
                     messageError={meta.touched && meta.error}
                   />
                 )}
@@ -65,7 +79,7 @@ const Login = () => {
                 render={({ input, meta }) => (
                   <InputText
                     input={input}
-                    label={"Password"}
+                    label="Mật khẩu"
                     messageError={meta.touched && meta.error}
                     type="password"
                   />
@@ -73,26 +87,44 @@ const Login = () => {
               />
               <Button
                 variant="contained"
-                onClick={() => onSubmit(values)}
+                type="submit"
                 sx={{
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  padding: '10px 20px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  borderRadius: '8px',
-                  '&:hover': {
-                    backgroundColor: 'primary.dark',
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  "&:hover": {
+                    backgroundColor: "#155a8a",
                   },
-                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                 }}
               >
-                Submit
+                Đăng nhập
               </Button>
+              <Typography textAlign="center" mt={2}>
+                Chưa có tài khoản?{" "}
+                <Link
+                  href="/register"
+                  sx={{ color: "#1976d2", "&:hover": { color: "#155a8a" } }}
+                >
+                  Đăng ký ngay
+                </Link>
+              </Typography>
             </Stack>
-          );
-        }}
+          </form>
+        )}
       />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

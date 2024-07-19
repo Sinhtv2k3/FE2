@@ -1,5 +1,6 @@
 import { useRoutes } from "react-router-dom";
-import AdminLayout from "./layouts/AdminLayout";
+import AdminLayout from "./layouts/Admin";
+import LayoutAdmin from "./layouts/AdminLayout";
 import AdminProductList from "./pages/admin/product/List";
 import AdminProductAdd from "./pages/admin/product/Add";
 import AdminProductEdit from "./pages/admin/product/Edit";
@@ -9,35 +10,45 @@ import ClientLayout from "./layouts/ClientLayout";
 import Cart from "./pages/Cart";
 import Homepage from "./Homepage";
 import AdminCategoriesList from "./pages/admin/categories/List";
-import AdminCategories from "./pages/admin/categories/Add";
+import AdminCategoriesAdd from "./pages/admin/categories/Add";
+import AdminCategoriesEdit from "./pages/admin/categories/Edit";
+import NotFoundPage from "./components/Notfound";
+
+
 const routeConfig = [
   {
     path: "admin",
-    element: <AdminLayout />,
+    element: <LayoutAdmin />, 
     children: [
       {
-        path:"categories/list",
-        element:<AdminCategoriesList/>
-      },
-      {
-        path:"categories/add",
-        element:<AdminCategories/>
-      },
-      {
-        path:"product/categories/list",
-        element:<AdminCategoriesList/>
-      },
-      {
-        path: "product/list",
-        element: <AdminProductList />,
-      },
-      {
-        path: "product/add",
-        element: <AdminProductAdd />,
-      },
-      {
-        path: "product/edit/:id",
-        element: <AdminProductEdit />,
+        path: "",
+        element: <AdminLayout />, 
+        children: [
+          {
+            path: "categories/list",
+            element: <AdminCategoriesList />,
+          },
+          {
+            path: "categories/add",
+            element: <AdminCategoriesAdd />,
+          },
+          {
+            path: "categories/edit/:id",
+            element: <AdminCategoriesEdit />,
+          },
+          {
+            path: "product/list",
+            element: <AdminProductList />,
+          },
+          {
+            path: "product/add",
+            element: <AdminProductAdd />,
+          },
+          {
+            path: "product/edit/:id",
+            element: <AdminProductEdit />,
+          },
+        ],
       },
     ],
   },
@@ -46,22 +57,26 @@ const routeConfig = [
     element: <ClientLayout />,
     children: [
       {
-        path: "homepage",
+        path: "",
         element: <Homepage />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
-      {
-        path: "login",
-        element: <Login />,
       },
       {
         path: "cart",
         element: <Cart />,
       },
     ],
+  },
+  {
+    path: "register",
+    element: <Register />,
+  },
+  {
+    path: "login",
+    element: <Login />,
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ];
 
